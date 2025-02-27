@@ -1,5 +1,3 @@
-// frontend/src/components/custom/Navbar.tsx
-
 import { FC } from 'react';
 import { Github, Linkedin, Globe } from 'lucide-react';
 import Link from 'next/link';
@@ -7,8 +5,8 @@ import { Button } from '@/components/ui/button';
 
 export const Navbar: FC = () => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="fixed top-0 z-50 w-full">
+      <div className="container flex h-16 w-full items-center justify-between mx-auto backdrop-blur-sm bg-background/70">
         <div className="flex items-center gap-2">
           <Link href="/" className="font-bold text-2xl tracking-tight">
             Voyager

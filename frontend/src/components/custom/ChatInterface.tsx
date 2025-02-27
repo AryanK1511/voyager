@@ -1,5 +1,3 @@
-// frontend/src/components/custom/ChatInterface.tsx
-
 'use client';
 
 import { useState, useRef, useEffect, FC } from 'react';
@@ -27,15 +25,18 @@ const placeholderTexts = [
   "Ask about Aryan's hobbies...",
 ];
 
-export const ChatInterface: FC = () => {
+interface ChatInterfaceProps {
+  setChatStarted: (started: boolean) => void;
+}
+
+export const ChatInterface: FC<ChatInterfaceProps> = ({ setChatStarted }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [placeholderIndex, setPlaceholderIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(false);
-  const [chatStarted, setChatStarted] = useState(false);
+  const [chatStarted, setChatStartedState] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Rotate through placeholder texts
   useEffect(() => {
     const interval = setInterval(() => {
       setPlaceholderIndex((prevIndex) => (prevIndex + 1) % placeholderTexts.length);
@@ -43,10 +44,9 @@ export const ChatInterface: FC = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Auto-scroll to bottom of messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messagesEndRef]); //Corrected dependency
+  }, [messagesEndRef]);
 
   const handleSendMessage = (messageText: string = input) => {
     if (!messageText.trim()) return;
@@ -62,6 +62,7 @@ export const ChatInterface: FC = () => {
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
     setChatStarted(true);
+    setChatStartedState(true);
     setIsTyping(true);
 
     // Simulate bot response after a delay
