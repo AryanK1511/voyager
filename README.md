@@ -1,6 +1,6 @@
 # Voyager
 
-My personal chatbot that knows everything about me 🌍🤖
+My personal chatbot that knows everything about me 🌍🤖.
 
 ## Author
 
