@@ -1,237 +1,192 @@
 'use client';
 
-import { useState, useRef, useEffect, FC } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Send } from 'lucide-react';
-import { Card, Avatar, AvatarFallback, AvatarImage, Button, Input } from '@/components';
-
-type Message = {
-  id: string;
+import { FC, useState, useRef, useEffect, FormEvent, ChangeEvent } from 'react';
+import { Paperclip, ArrowUp } from 'lucide-react';
+import { format } from 'date-fns';
+import { Hero } from '@/components';
+interface Message {
+  role: 'user' | 'bot';
   content: string;
-  sender: 'user' | 'bot';
-  timestamp: Date;
-};
-
-const sampleQuestions = [
-  "What are Aryan's skills?",
-  "Tell me about Aryan's background",
-  'What projects has Aryan worked on?',
-];
-
-const placeholderTexts = [
-  "Ask about Aryan's experience...",
-  "Ask about Aryan's projects...",
-  "Ask about Aryan's education...",
-  "Ask about Aryan's hobbies...",
-];
-
-interface ChatInterfaceProps {
-  setChatStarted: (started: boolean) => void;
 }
 
-export const ChatInterface: FC<ChatInterfaceProps> = ({ setChatStarted }) => {
+export const ChatInterface: FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  const [isTyping, setIsTyping] = useState(false);
-  const [chatStarted, setChatStartedState] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Example prompts
+  const examplePrompts = [
+    {
+      title: 'What are the advantages',
+      subtitle: 'of using Next.js?',
+    },
+    {
+      title: 'Write code to',
+      subtitle: "demonstrate dijkstra's algorithm",
+    },
+    {
+      title: 'Help me write an essay',
+      subtitle: 'about silicon valley',
+    },
+    {
+      title: 'What is the weather',
+      subtitle: 'in San Francisco?',
+    },
+  ];
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setPlaceholderIndex((prevIndex) => (prevIndex + 1) % placeholderTexts.length);
-    }, 3000);
-    return () => clearInterval(interval);
+    setMounted(true);
   }, []);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messagesEndRef]);
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages]);
 
-  const handleSendMessage = (messageText: string = input) => {
-    if (!messageText.trim()) return;
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
 
-    // Add user message
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      content: messageText,
-      sender: 'user',
-      timestamp: new Date(),
-    };
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    if (!input.trim()) return;
 
+    setIsLoading(true);
+    const userMessage: Message = { role: 'user', content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
-    setChatStarted(true);
-    setChatStartedState(true);
-    setIsTyping(true);
 
-    // Simulate bot response after a delay
-    setTimeout(() => {
-      const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: `Thanks for asking about Aryan! This is a simulated response to: "${messageText}"`,
-        sender: 'bot',
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, botMessage]);
-      setIsTyping(false);
-    }, 1500);
+    try {
+      const response = await fetch('/api/v1/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: input,
+          history: messages,
+        }),
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch response');
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error('No reader available');
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const text = new TextDecoder().decode(value);
+        const lines = text.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const content = line.slice(6);
+            setMessages((prev) => {
+              const lastMessage = prev[prev.length - 1];
+              if (lastMessage?.role === 'bot') {
+                return [
+                  ...prev.slice(0, -1),
+                  { role: 'bot', content: lastMessage.content + content },
+                ];
+              }
+              return [...prev, { role: 'bot', content }];
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'bot', content: 'Sorry, something went wrong. Please try again.' },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleSampleQuestion = (question: string) => {
-    setInput(question);
-    handleSendMessage(question);
+  const handleExampleClick = (prompt: string) => {
+    setInput(prompt);
+    handleSubmit({ preventDefault: () => {} } as FormEvent<HTMLFormElement>);
   };
+
+  if (!mounted) return null;
 
   return (
-    <div className="flex flex-col w-full max-w-3xl mx-auto">
-      {!chatStarted ? (
-        <motion.div
-          className="space-y-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.6, duration: 0.5 }}
-        >
-          <div className="relative">
-            <Input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={placeholderTexts[placeholderIndex]}
-              className="pr-10 py-6 text-lg"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleSendMessage();
-              }}
-            />
-            <Button
-              size="icon"
-              className="absolute right-2 top-1/2 transform -translate-y-1/2"
-              onClick={() => handleSendMessage()}
-              disabled={!input.trim()}
-            >
-              <Send className="h-5 w-5" />
-              <span className="sr-only">Send message</span>
-            </Button>
-          </div>
+    <div className="flex flex-col h-[calc(100vh-4rem)] bg-black text-white">
+      {/* Header */}
+      <header className="flex-none flex flex-col items-center justify-center p-4 text-center">
+        <Hero />
+      </header>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {sampleQuestions.map((question, index) => (
-              <motion.div
+      {/* Chat Area */}
+      <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-4">
+        {messages.length === 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+            {examplePrompts.map((prompt, index) => (
+              <button
                 key={index}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
+                className="border border-gray-700 rounded-lg p-4 text-left hover:bg-gray-900 transition-colors"
+                onClick={() => handleExampleClick(`${prompt.title} ${prompt.subtitle}`)}
               >
-                <Card
-                  className="p-4 cursor-pointer hover:bg-accent transition-colors"
-                  onClick={() => handleSampleQuestion(question)}
-                >
-                  <p className="text-sm font-medium">{question}</p>
-                </Card>
-              </motion.div>
+                <p className="text-gray-300">{prompt.title}</p>
+                <p className="text-gray-500">{prompt.subtitle}</p>
+              </button>
             ))}
           </div>
-        </motion.div>
-      ) : (
-        <motion.div
-          className="flex flex-col space-y-4 mt-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3 }}
-        >
-          <AnimatePresence>
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
+        ) : (
+          <div className="max-w-3xl mx-auto space-y-4">
+            {messages.map((message, index) => (
+              <div
+                key={index}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`flex gap-3 max-w-[80%] ${message.sender === 'user' ? 'flex-row-reverse' : ''}`}
+                  className={`max-w-[80%] rounded-lg p-4 ${
+                    message.role === 'user' ? 'bg-gray-700 text-white' : 'bg-gray-800 text-white'
+                  }`}
                 >
-                  <Avatar className={message.sender === 'user' ? 'bg-primary' : 'bg-secondary'}>
-                    <AvatarFallback>{message.sender === 'user' ? 'U' : 'V'}</AvatarFallback>
-                    {message.sender === 'bot' && (
-                      <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Voyager" />
-                    )}
-                  </Avatar>
-                  <div
-                    className={`rounded-lg p-4 ${
-                      message.sender === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
-                    }`}
-                  >
-                    <p>{message.content}</p>
-                    <p className="text-xs opacity-70 mt-1">
-                      {message.timestamp.toLocaleTimeString([], {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                      })}
-                    </p>
+                  <div className="mb-1 text-sm text-gray-400">
+                    {message.role === 'user' ? 'You' : 'AI'} • {format(new Date(), 'h:mm a')}
                   </div>
+                  <div className="whitespace-pre-wrap">{message.content}</div>
                 </div>
-              </motion.div>
+              </div>
             ))}
-
-            {isTyping && (
-              <motion.div
-                className="flex justify-start"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
-                <div className="flex gap-3 max-w-[80%]">
-                  <Avatar className="bg-secondary">
-                    <AvatarFallback>V</AvatarFallback>
-                    <AvatarImage src="/placeholder.svg?height=40&width=40" alt="Voyager" />
-                  </Avatar>
-                  <div className="rounded-lg p-4 bg-muted">
-                    <div className="flex space-x-1">
-                      <div
-                        className="w-2 h-2 rounded-full bg-foreground/50 animate-bounce"
-                        style={{ animationDelay: '0ms' }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 rounded-full bg-foreground/50 animate-bounce"
-                        style={{ animationDelay: '150ms' }}
-                      ></div>
-                      <div
-                        className="w-2 h-2 rounded-full bg-foreground/50 animate-bounce"
-                        style={{ animationDelay: '300ms' }}
-                      ></div>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <div ref={messagesEndRef} />
-
-          <div className="sticky bottom-4 mt-4">
-            <div className="relative">
-              <Input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder={placeholderTexts[placeholderIndex]}
-                className="pr-10 py-6 text-lg"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleSendMessage();
-                }}
-              />
-              <Button
-                size="icon"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                onClick={() => handleSendMessage()}
-                disabled={!input.trim()}
-              >
-                <Send className="h-5 w-5" />
-                <span className="sr-only">Send message</span>
-              </Button>
-            </div>
+            <div ref={messagesEndRef} />
           </div>
-        </motion.div>
-      )}
+        )}
+      </div>
+
+      <div className="flex-none p-4">
+        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+          <div className="relative border border-gray-700 rounded-full bg-gray-900">
+            <button
+              type="button"
+              className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"
+            >
+              <Paperclip className="h-5 w-5" />
+            </button>
+            <input
+              type="text"
+              value={input}
+              onChange={handleInputChange}
+              placeholder="Send a message..."
+              className="w-full bg-transparent py-4 px-12 focus:outline-none text-white"
+            />
+            <button
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-gray-700 rounded-full p-1 disabled:opacity-50"
+            >
+              <ArrowUp className="h-5 w-5" />
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

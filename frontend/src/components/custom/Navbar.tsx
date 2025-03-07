@@ -1,37 +1,58 @@
-import { FC } from 'react';
-import { Github, Linkedin, Globe } from 'lucide-react';
+'use client';
+
+import { FC, useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { FileText, ChevronDown, Github, Linkedin, Globe } from 'lucide-react';
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components';
+import { AVAILABLE_MODELS } from '@/lib/constants';
 
 export const Navbar: FC = () => {
+  const [model, setModel] = useState(AVAILABLE_MODELS[0].name);
+
   return (
-    <header className="fixed top-0 z-50 w-full">
-      <div className="container flex h-16 w-full items-center justify-between mx-auto backdrop-blur-sm bg-background/70">
-        <div className="flex items-center gap-2">
-          <Link href="/" className="font-bold text-2xl tracking-tight">
-            Voyager
-          </Link>
-        </div>
-        <nav className="flex items-center gap-2">
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-              <Linkedin className="h-5 w-5" />
-              <span className="sr-only">LinkedIn</span>
-            </Link>
+    <header className="flex h-12 w-full items-center justify-between bg-black px-3">
+      <div className="flex items-center gap-2">
+        <Button variant="ghost" size="icon" className="h-9 w-9 text-white">
+          <FileText className="h-5 w-5" />
+        </Button>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="flex items-center gap-1 text-white">
+              {model}
+              <ChevronDown className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {AVAILABLE_MODELS.map((model) => (
+              <DropdownMenuItem key={model.value} onClick={() => setModel(model.name)}>
+                {model.name}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      <div className="flex items-center gap-2">
+        <Link href="https://linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer">
+          <Button variant="ghost" size="icon" className="h-9 w-9 text-white">
+            <Linkedin className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="https://github.com" target="_blank" rel="noopener noreferrer">
-              <Github className="h-5 w-5" />
-              <span className="sr-only">GitHub</span>
-            </Link>
+        </Link>
+        <Link href="https://github.com/yourusername" target="_blank" rel="noopener noreferrer">
+          <Button variant="ghost" size="icon" className="h-9 w-9 text-white">
+            <Github className="h-5 w-5" />
           </Button>
-          <Button variant="ghost" size="icon" asChild>
-            <Link href="https://example.com" target="_blank" rel="noopener noreferrer">
-              <Globe className="h-5 w-5" />
-              <span className="sr-only">Portfolio</span>
-            </Link>
+        </Link>
+        <Link href="https://yourpersonalwebsite.com" target="_blank" rel="noopener noreferrer">
+          <Button variant="ghost" size="icon" className="h-9 w-9 text-white">
+            <Globe className="h-5 w-5" />
           </Button>
-        </nav>
+        </Link>
       </div>
     </header>
   );
