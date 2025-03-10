@@ -3,20 +3,27 @@
 'use client';
 
 import { FC, useState } from 'react';
-import { ChatInterface, Hero, Navbar } from '@/components';
+import { motion } from 'framer-motion';
+import { Navbar, Hero } from '@/components';
+import { AvailableModels } from '@/lib';
 
 const Home: FC = () => {
-  const [chatStarted, setChatStarted] = useState(false);
+  const [currentModel, setCurrentModel] = useState(AvailableModels[0].id);
 
   return (
     <main className="min-h-screen flex flex-col text-white">
-      <Navbar />
-      <div className="h-screen flex items-center justify-center">
-        <div className="flex-1 container mx-auto px-4 py-8 flex flex-col">
-          <Hero chatStarted={chatStarted} />
-          <ChatInterface setChatStarted={setChatStarted} />
+      <motion.div
+        key="welcome"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.7, ease: 'easeInOut' }}
+        className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden"
+      >
+        <Navbar currentModel={currentModel} setCurrentModel={setCurrentModel} />
+        <div className="w-full">
+          <Hero currentModel={currentModel} />
         </div>
-      </div>
+      </motion.div>
     </main>
   );
 };
