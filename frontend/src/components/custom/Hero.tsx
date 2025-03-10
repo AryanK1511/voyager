@@ -94,7 +94,7 @@ export const Hero: FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col pt-16 overflow-hidden">
+    <div className="min-h-screen flex flex-col pt-24 overflow-hidden">
       <AnimatePresence mode="wait">
         {!isChatMode ? (
           <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden">
@@ -108,7 +108,7 @@ export const Hero: FC = () => {
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-zinc-300">
                   Welcome to <AuroraText>Voyager</AuroraText>
                 </h1>
-                <p className="text-lg sm:text-xl text-zinc-500 max-w-2xl mx-auto">
+                <p className="text-md sm:text-lg lg-text-xl text-zinc-500 max-w-2xl mx-auto">
                   A personalized AI chatbot designed to know everything about{' '}
                   <a
                     href="https://www.linkedin.com/in/aryank1511/"
