@@ -12,5 +12,3 @@ export {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 export { AVAILABLE_MODELS } from '@/lib/constants';
-export { ChatInterface } from './custom/ChatInterface';
-export { Hero } from './custom/Hero';

@@ -3,13 +3,12 @@
 'use client';
 
 import { FC } from 'react';
-import { Navbar, ChatInterface } from '@/components';
+import { Navbar } from '@/components';
 
 const Home: FC = () => {
   return (
     <main className="min-h-screen flex flex-col text-white">
       <Navbar />
-      <ChatInterface />
     </main>
   );
 };
