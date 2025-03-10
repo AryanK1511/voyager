@@ -2,13 +2,17 @@
 
 'use client';
 
-import { FC } from 'react';
-import { Navbar } from '@/components';
+import { FC, useState } from 'react';
+import { Navbar, Hero } from '@/components';
+import { AVAILABLE_MODELS } from '@/lib/constants';
 
 const Home: FC = () => {
+  const [currentModel, setCurrentModel] = useState(AVAILABLE_MODELS[0].name);
+
   return (
     <main className="min-h-screen flex flex-col text-white">
-      <Navbar />
+      <Navbar currentModel={currentModel} setCurrentModel={setCurrentModel} />
+      <Hero />
     </main>
   );
 };

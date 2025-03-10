@@ -1,41 +1,20 @@
 'use client';
 
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import Link from 'next/link';
-import { FileText, ChevronDown, Github, Linkedin, Globe } from 'lucide-react';
-import {
-  Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components';
-import { AVAILABLE_MODELS } from '@/lib/constants';
+import { Github, Linkedin, Globe } from 'lucide-react';
+import { Button, ModelSelector } from '@/components';
 
-export const Navbar: FC = () => {
-  const [model, setModel] = useState(AVAILABLE_MODELS[0].name);
+type NavbarProps = {
+  currentModel: string;
+  setCurrentModel: (model: string) => void;
+};
 
+export const Navbar: FC<NavbarProps> = ({ currentModel, setCurrentModel }) => {
   return (
-    <header className="flex h-12 w-full items-center justify-between bg-black px-3">
+    <header className="flex h-12 w-full items-center justify-between px-16 py-8">
       <div className="flex items-center gap-2">
-        <Button variant="ghost" size="icon" className="h-9 w-9 text-white">
-          <FileText className="h-5 w-5" />
-        </Button>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="flex items-center gap-1 text-white">
-              {model}
-              <ChevronDown className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start">
-            {AVAILABLE_MODELS.map((model) => (
-              <DropdownMenuItem key={model.value} onClick={() => setModel(model.name)}>
-                {model.name}
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <ModelSelector currentModel={currentModel} setCurrentModel={setCurrentModel} />
       </div>
       <div className="flex items-center gap-2">
         <Link href="https://linkedin.com/in/yourprofile" target="_blank" rel="noopener noreferrer">

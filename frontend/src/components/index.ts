@@ -12,3 +12,8 @@ export {
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
 export { AVAILABLE_MODELS } from '@/lib/constants';
+export { ModelSelector } from './custom/ModelSelector';
+export { Hero } from './custom/Hero';
+export { DefaultPrompts } from './custom/DefaultPrompts';
+export { SearchBar } from './custom/SearchBar';
+export { Textarea } from './ui/textarea';
