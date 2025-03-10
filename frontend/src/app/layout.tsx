@@ -5,7 +5,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'Voyager',
-  description: "Aryan's personal chatbot that knows everything about him",
+  description: 'A personalized AI chatbot designed to know everything about Aryan.',
 };
 
 export default function RootLayout({

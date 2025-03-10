@@ -1,15 +1,12 @@
 // frontend/src/components/custom/Hero.tsx
 
 import { FC, useState, useRef, useEffect } from 'react';
-import { DefaultPromptsSection, SearchBar, AuroraText, ChatMessage } from '@/components';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ApiHelper } from '@/lib/utils/apiHelper';
 import ReactMarkdown from 'react-markdown';
-
-type Message = {
-  role: 'user' | 'bot';
-  content: string;
-};
+import Image from 'next/image';
+import { DefaultPromptsSection, SearchBar, AuroraText, ChatMessage } from '@/components';
+import { ApiHelper } from '@/lib';
+import type { Message } from '@/lib';
 
 export const Hero: FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -42,7 +39,7 @@ export const Hero: FC = () => {
         query: message,
         model: 'gpt-4o-mini',
         history: messages.map((msg) => ({
-          role: msg.role === 'user' ? 'user' : 'bot',
+          role: msg.role,
           content: msg.content,
         })),
       });
@@ -80,14 +77,14 @@ export const Hero: FC = () => {
         }
       }
 
-      setMessages((prev) => [...prev, { role: 'bot', content: accumulatedContent }]);
+      setMessages((prev) => [...prev, { role: 'assistant', content: accumulatedContent }]);
       setStreamedContent('');
     } catch (error) {
       console.error('Error streaming response:', error);
       setMessages((prev) => [
         ...prev,
         {
-          role: 'bot',
+          role: 'assistant',
           content: 'Sorry, there was an error processing your request. Please try again.',
         },
       ]);
@@ -127,6 +124,7 @@ export const Hero: FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.4, ease: 'easeInOut' }}
+                className="w-full max-w-4xl mx-auto"
               >
                 <DefaultPromptsSection />
               </motion.div>
@@ -151,10 +149,13 @@ export const Hero: FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.4, ease: 'easeInOut' }}
-            className="flex-1 flex flex-col overflow-hidden"
+            className="flex-1 flex flex-col w-full"
           >
-            <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4">
-              <div className="max-w-4xl mx-auto mt-6">
+            <div
+              ref={chatContainerRef}
+              className="flex-1 overflow-y-auto w-full flex justify-center"
+            >
+              <div className="w-full max-w-2xl px-4 mt-6">
                 <AnimatePresence>
                   {messages.map((message, index) => (
                     <motion.div
@@ -163,6 +164,7 @@ export const Hero: FC = () => {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="w-full"
                     >
                       <ChatMessage role={message.role} content={message.content} />
                     </motion.div>
@@ -172,13 +174,25 @@ export const Hero: FC = () => {
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="w-full"
                     >
-                      <div className="flex items-start space-x-4 p-4 rounded-lg bg-zinc-800/50">
-                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
-                          <span className="text-white text-sm">AI</span>
+                      <div className="flex gap-4 py-4 w-full">
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full overflow-hidden">
+                            <Image
+                              src="/images/logo.png"
+                              alt="Voyager Logo"
+                              width={32}
+                              height={32}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
                         </div>
-                        <div className="flex-1 prose prose-invert max-w-none">
-                          <ReactMarkdown>{streamedContent}</ReactMarkdown>
+                        <div className="flex-1 w-full">
+                          <div className="font-medium text-zinc-300 mb-1">Voyager</div>
+                          <div className="prose prose-invert max-w-none w-full">
+                            <ReactMarkdown>{streamedContent}</ReactMarkdown>
+                          </div>
                         </div>
                       </div>
                     </motion.div>
@@ -191,11 +205,11 @@ export const Hero: FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.1, duration: 0.4, ease: 'easeInOut' }}
-              className="fixed bottom-0 left-0 right-0 p-4 mt-4 bg-dark-background"
+              className="fixed bottom-0 left-0 right-0 p-4 bg-dark-background flex justify-center"
             >
-              <div className="max-w-4xl mx-auto">
+              <div className="w-full max-w-2xl">
                 <SearchBar onSend={handleSendMessage} disabled={isStreaming} />
-                <p className="mt-6 text-xs text-zinc-500 text-center">
+                <p className="mt-2 text-xs text-zinc-500 text-center">
                   Note: Voyager can make mistakes. Please verify important information and consider
                   double-checking critical details.
                 </p>

@@ -4,17 +4,12 @@ import { FC, useRef, useEffect, useState } from 'react';
 import { Mic, Send, Square, RotateCcw } from 'lucide-react';
 import { Button, Textarea } from '@/components';
 import { SpeechRecognition, SpeechRecognitionEvent } from '@/lib';
-
+import type { SearchBarProps } from '@/lib';
 declare global {
   interface Window {
     webkitSpeechRecognition: any;
   }
 }
-
-type SearchBarProps = {
-  onSend: (message: string) => Promise<void>;
-  disabled?: boolean;
-};
 
 export const SearchBar: FC<SearchBarProps> = ({ onSend, disabled = false }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);

@@ -18,4 +18,4 @@ export { SearchBar } from './custom/SearchBar';
 export { Textarea } from './ui/textarea';
 export { Socials } from './custom/Socials';
 export { AuroraText } from './magicui/aurora-text';
-export * from './custom/ChatMessage';
+export { ChatMessage } from './custom/ChatMessage';

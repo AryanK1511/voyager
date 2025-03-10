@@ -10,11 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components';
 import { cn, AvailableModels } from '@/lib';
-
-type ModelSelectorProps = {
-  currentModel: string;
-  setCurrentModel: (model: string) => void;
-};
+import type { ModelSelectorProps } from '@/lib';
 
 export const ModelSelector: FC<ModelSelectorProps> = ({ currentModel, setCurrentModel }) => {
   return (

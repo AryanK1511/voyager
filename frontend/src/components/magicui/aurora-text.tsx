@@ -1,3 +1,5 @@
+// frontend/src/components/magicui/aurora-text.tsx
+
 'use client';
 
 import type { CSSProperties } from 'react';
@@ -7,7 +9,7 @@ interface AuroraTextProps {
   children: React.ReactNode;
   className?: string;
   colors?: string[];
-  speed?: number; // 1 is default speed, 2 is twice as fast, 0.5 is half speed
+  speed?: number;
 }
 
 export function AuroraText({

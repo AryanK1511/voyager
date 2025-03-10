@@ -1,3 +1,5 @@
+// frontend/src/lib/utils/apiHelper.ts
+
 interface ApiResponse<T = unknown> {
   status: boolean;
   message: string;

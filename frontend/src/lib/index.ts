@@ -9,5 +9,11 @@ export type {
   SpeechRecognitionResultList,
   SpeechRecognitionResult,
   SpeechRecognitionAlternative,
+  ChatMessageProps,
+  Message,
+  ModelSelectorProps,
+  NavbarProps,
+  SearchBarProps,
 } from './types';
 export { AvailableModels, DefaultPrompts } from './constants';
+export { ApiHelper } from './utils/apiHelper';

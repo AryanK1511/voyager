@@ -17,10 +17,12 @@ const Home: FC = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.7, ease: 'easeInOut' }}
-        className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden"
+        className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 overflow-hidden"
       >
         <Navbar currentModel={currentModel} setCurrentModel={setCurrentModel} />
-        <Hero />{' '}
+        <div className="w-full">
+          <Hero />
+        </div>
       </motion.div>
     </main>
   );

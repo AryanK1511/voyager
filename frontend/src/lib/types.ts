@@ -47,3 +47,28 @@ export interface SpeechRecognitionAlternative {
   transcript: string;
   confidence: number;
 }
+
+export type ChatMessageProps = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+export type Message = {
+  role: 'user' | 'assistant';
+  content: string;
+};
+
+export type ModelSelectorProps = {
+  currentModel: string;
+  setCurrentModel: (model: string) => void;
+};
+
+export type NavbarProps = {
+  currentModel: string;
+  setCurrentModel: (model: string) => void;
+};
+
+export type SearchBarProps = {
+  onSend: (message: string) => void;
+  disabled?: boolean;
+};
