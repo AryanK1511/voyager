@@ -1,0 +1,49 @@
+// frontend/src/lib/types.ts
+
+import { LucideIcon } from 'lucide-react';
+
+export type Model = {
+  id: string;
+  name: string;
+  description: string;
+  badge?: {
+    text: string;
+    variant: 'default' | 'secondary' | 'destructive' | 'outline';
+  };
+};
+
+export type PromptCard = {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+};
+
+export interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start(): void;
+  stop(): void;
+  onresult: (event: SpeechRecognitionEvent) => void;
+  onend: () => void;
+}
+
+export interface SpeechRecognitionEvent {
+  results: SpeechRecognitionResultList;
+}
+
+export interface SpeechRecognitionResultList {
+  length: number;
+  item(index: number): SpeechRecognitionResult;
+  [index: number]: SpeechRecognitionResult;
+}
+
+export interface SpeechRecognitionResult {
+  [index: number]: SpeechRecognitionAlternative;
+  isFinal: boolean;
+}
+
+export interface SpeechRecognitionAlternative {
+  transcript: string;
+  confidence: number;
+}

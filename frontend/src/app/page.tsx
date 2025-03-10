@@ -4,10 +4,9 @@
 
 import { FC, useState } from 'react';
 import { Navbar, Hero } from '@/components';
-import { AVAILABLE_MODELS } from '@/lib/constants';
-
+import { AvailableModels } from '@/lib';
 const Home: FC = () => {
-  const [currentModel, setCurrentModel] = useState(AVAILABLE_MODELS[0].name);
+  const [currentModel, setCurrentModel] = useState(AvailableModels[0].id);
 
   return (
     <main className="min-h-screen flex flex-col text-white">

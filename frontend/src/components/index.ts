@@ -11,9 +11,10 @@ export {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from './ui/dropdown-menu';
-export { AVAILABLE_MODELS } from '@/lib/constants';
 export { ModelSelector } from './custom/ModelSelector';
 export { Hero } from './custom/Hero';
-export { DefaultPrompts } from './custom/DefaultPrompts';
+export { DefaultPromptsSection } from './custom/DefaultPromptsSection';
 export { SearchBar } from './custom/SearchBar';
 export { Textarea } from './ui/textarea';
+export { Socials } from './custom/Socials';
+export { AuroraText } from './magicui/aurora-text';
