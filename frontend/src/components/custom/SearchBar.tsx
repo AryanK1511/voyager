@@ -13,9 +13,10 @@ declare global {
 
 type SearchBarProps = {
   onSend: (message: string) => Promise<void>;
+  disabled?: boolean;
 };
 
-export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
+export const SearchBar: FC<SearchBarProps> = ({ onSend, disabled = false }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [value, setValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -24,7 +25,6 @@ export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
   const finalTranscriptRef = useRef<string>('');
 
   useEffect(() => {
-    // Initialize speech recognition
     if ('webkitSpeechRecognition' in window) {
       const recognition = new (window.webkitSpeechRecognition as any)();
       recognition.continuous = true;
@@ -47,19 +47,16 @@ export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
           }
         }
 
-        // Update the final transcript reference
         if (finalTranscript) {
           finalTranscriptRef.current = finalTranscript.trim();
         }
 
-        // Combine final and interim transcripts for smooth display
         const displayText =
           finalTranscriptRef.current + (interimTranscript ? ' ' + interimTranscript : '');
         setValue(displayText.trim());
       };
 
       recognition.onend = () => {
-        // Restart recognition if we're still recording
         if (isRecording) {
           recognition.start();
         }
@@ -74,9 +71,9 @@ export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
 
     if (isRecording) {
       recognitionRef.current.stop();
-      finalTranscriptRef.current = ''; // Reset the final transcript
+      finalTranscriptRef.current = '';
     } else {
-      setValue(''); // Clear the textarea when starting new recording
+      setValue('');
       recognitionRef.current.start();
     }
     setIsRecording(!isRecording);
@@ -91,7 +88,6 @@ export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
     setIsSending(false);
   };
 
-  // Focus textarea after sending a message
   useEffect(() => {
     if (!isSending && textareaRef.current) {
       textareaRef.current.focus();
@@ -135,8 +131,9 @@ export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
           onChange={(e) => setValue(e.target.value.slice(0, 2000))}
           onKeyDown={handleKeyDown}
           placeholder="Ask Anything about Aryan"
-          className="w-full resize-none border-none bg-transparent px-0 py-0 text-zinc-300 placeholder:text-zinc-500 focus:ring-0 focus-visible:ring-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-800/50 [&::-webkit-scrollbar-thumb]:bg-zinc-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500"
+          className="w-full resize-none border-none bg-transparent px-0 py-0 text-zinc-300 placeholder:text-zinc-500 focus:ring-0 focus-visible:ring-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-800/50 [&::-webkit-scrollbar-thumb]:bg-zinc-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500 disabled:opacity-50 disabled:cursor-not-allowed"
           rows={1}
+          disabled={disabled}
         />
         <div className="flex justify-end mt-1">
           <span className="text-xs text-zinc-500">{value.length}/2000</span>
@@ -147,7 +144,8 @@ export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
               variant="ghost"
               size="icon"
               onClick={toggleRecording}
-              className={`h-10 w-10 rounded-full ${isRecording ? 'bg-red-500/50 text-red-500 hover:bg-red-500/50' : 'bg-zinc-700/50 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-700/50'}`}
+              disabled={disabled}
+              className={`h-10 w-10 rounded-full ${isRecording ? 'bg-red-500/50 text-red-500 hover:bg-red-500/50' : 'bg-zinc-700/50 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-700/50'} disabled:opacity-50 disabled:cursor-not-allowed`}
             >
               {isRecording ? <Square /> : <Mic />}
             </Button>
@@ -155,7 +153,8 @@ export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
               variant="ghost"
               size="icon"
               onClick={handleReset}
-              className="h-10 w-10 rounded-full bg-zinc-700/50 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-700/50"
+              disabled={disabled}
+              className="h-10 w-10 rounded-full bg-zinc-700/50 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-700/50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <RotateCcw />
             </Button>
@@ -163,8 +162,8 @@ export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
           <Button
             size="icon"
             onClick={handleSend}
-            disabled={!value.trim() || isSending}
-            className={`h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 ${!value.trim() || isSending ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={!value.trim() || isSending || disabled}
+            className={`h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 ${!value.trim() || isSending || disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             <Send />
           </Button>

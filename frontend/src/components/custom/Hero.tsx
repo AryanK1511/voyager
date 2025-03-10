@@ -3,17 +3,22 @@
 import { FC, useState, useRef, useEffect } from 'react';
 import { DefaultPromptsSection, SearchBar, AuroraText, ChatMessage } from '@/components';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ApiHelper } from '@/lib/utils/apiHelper';
+import ReactMarkdown from 'react-markdown';
 
 type Message = {
-  role: 'user' | 'assistant';
+  role: 'user' | 'bot';
   content: string;
 };
 
 export const Hero: FC = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isChatMode, setIsChatMode] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const [streamedContent, setStreamedContent] = useState('');
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const apiHelper = useRef(new ApiHelper());
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -21,7 +26,7 @@ export const Hero: FC = () => {
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages]);
+  }, [messages, streamedContent]);
 
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
@@ -29,13 +34,66 @@ export const Hero: FC = () => {
     const userMessage: Message = { role: 'user', content: message };
     setMessages((prev) => [...prev, userMessage]);
     setIsChatMode(true);
+    setIsStreaming(true);
+    setStreamedContent('');
 
-    const aiMessage: Message = {
-      role: 'assistant',
-      content:
-        'This is a sample response in **markdown** format. You can use *italics* and `code` blocks too!',
-    };
-    setMessages((prev) => [...prev, aiMessage]);
+    try {
+      const response = await apiHelper.current.post('chat', {
+        query: message,
+        model: 'gpt-4o-mini',
+        history: messages.map((msg) => ({
+          role: msg.role === 'user' ? 'user' : 'bot',
+          content: msg.content,
+        })),
+      });
+
+      if (!response.status) {
+        throw new Error(response.message || 'Failed to fetch response');
+      }
+
+      const responseData = response.data as Response;
+      if (!responseData) {
+        throw new Error('No response data available');
+      }
+
+      const reader = responseData.body?.getReader();
+      if (!reader) {
+        throw new Error('No reader available');
+      }
+
+      const decoder = new TextDecoder();
+      let accumulatedContent = '';
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value);
+        const lines = chunk.split('\n');
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const content = line.slice(6);
+            accumulatedContent += content;
+            setStreamedContent(accumulatedContent);
+          }
+        }
+      }
+
+      setMessages((prev) => [...prev, { role: 'bot', content: accumulatedContent }]);
+      setStreamedContent('');
+    } catch (error) {
+      console.error('Error streaming response:', error);
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: 'bot',
+          content: 'Sorry, there was an error processing your request. Please try again.',
+        },
+      ]);
+    } finally {
+      setIsStreaming(false);
+    }
   };
 
   return (
@@ -96,7 +154,7 @@ export const Hero: FC = () => {
             className="flex-1 flex flex-col overflow-hidden"
           >
             <div ref={chatContainerRef} className="flex-1 overflow-y-auto px-4">
-              <div className="max-w-3xl mx-auto mt-6">
+              <div className="max-w-4xl mx-auto mt-6">
                 <AnimatePresence>
                   {messages.map((message, index) => (
                     <motion.div
@@ -109,6 +167,22 @@ export const Hero: FC = () => {
                       <ChatMessage role={message.role} content={message.content} />
                     </motion.div>
                   ))}
+                  {isStreaming && streamedContent && (
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    >
+                      <div className="flex items-start space-x-4 p-4 rounded-lg bg-zinc-800/50">
+                        <div className="flex-shrink-0 w-8 h-8 rounded-full bg-purple-500 flex items-center justify-center">
+                          <span className="text-white text-sm">AI</span>
+                        </div>
+                        <div className="flex-1 prose prose-invert max-w-none">
+                          <ReactMarkdown>{streamedContent}</ReactMarkdown>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
                 </AnimatePresence>
                 <div ref={messagesEndRef} className="h-48" />
               </div>
@@ -119,8 +193,8 @@ export const Hero: FC = () => {
               transition={{ delay: 0.1, duration: 0.4, ease: 'easeInOut' }}
               className="fixed bottom-0 left-0 right-0 p-4 mt-4 bg-dark-background"
             >
-              <div className="max-w-3xl mx-auto">
-                <SearchBar onSend={handleSendMessage} />
+              <div className="max-w-4xl mx-auto">
+                <SearchBar onSend={handleSendMessage} disabled={isStreaming} />
                 <p className="mt-6 text-xs text-zinc-500 text-center">
                   Note: Voyager can make mistakes. Please verify important information and consider
                   double-checking critical details.

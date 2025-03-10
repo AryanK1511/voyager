@@ -40,6 +40,14 @@ export class ApiHelper {
         body: options.body ? JSON.stringify(options.body) : undefined,
       });
 
+      if (response.headers.get('content-type')?.includes('text/event-stream')) {
+        return {
+          status: true,
+          message: 'Streaming response',
+          data: response as unknown as T,
+        };
+      }
+
       const data = await response.json();
 
       if (!response.ok) {
