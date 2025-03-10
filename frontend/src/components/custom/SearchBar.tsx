@@ -1,7 +1,7 @@
 // frontend/src/components/custom/SearchBar.tsx
 
 import { FC, useRef, useEffect, useState } from 'react';
-import { Mic, Send, Square } from 'lucide-react';
+import { Mic, Send, Square, RotateCcw } from 'lucide-react';
 import { Button, Textarea } from '@/components';
 import { SpeechRecognition, SpeechRecognitionEvent } from '@/lib';
 
@@ -11,7 +11,11 @@ declare global {
   }
 }
 
-export const SearchBar: FC = () => {
+type SearchBarProps = {
+  onSend: (message: string) => Promise<void>;
+};
+
+export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [value, setValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
@@ -82,13 +86,20 @@ export const SearchBar: FC = () => {
     if (!value.trim() || isSending) return;
 
     setIsSending(true);
-    console.log('Message:', value);
-
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
+    await onSend(value);
     setValue('');
     setIsSending(false);
+  };
+
+  // Focus textarea after sending a message
+  useEffect(() => {
+    if (!isSending && textareaRef.current) {
+      textareaRef.current.focus();
+    }
+  }, [isSending]);
+
+  const handleReset = () => {
+    window.location.reload();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -116,8 +127,8 @@ export const SearchBar: FC = () => {
   }, [value]);
 
   return (
-    <div className="group relative flex w-full flex-col gap-2 rounded-3xl bg-zinc-800/50 px-4 py-3 shadow-lg transition-all duration-200 hover:border-zinc-600 ">
-      <div className=" px-2">
+    <div className="group relative flex w-full flex-col gap-2 rounded-3xl bg-zinc-800/50 px-4 py-3 shadow-lg transition-all duration-200 hover:border-zinc-600">
+      <div className="px-2">
         <Textarea
           ref={textareaRef}
           value={value}
@@ -128,14 +139,24 @@ export const SearchBar: FC = () => {
           rows={1}
         />
         <div className="flex items-center justify-between mt-6">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleRecording}
-            className={`h-10 w-10 rounded-full ${isRecording ? 'bg-red-500/50 text-red-500 hover:bg-red-500/50' : 'bg-zinc-700/50 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-700/50'}`}
-          >
-            {isRecording ? <Square /> : <Mic />}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleRecording}
+              className={`h-10 w-10 rounded-full ${isRecording ? 'bg-red-500/50 text-red-500 hover:bg-red-500/50' : 'bg-zinc-700/50 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-700/50'}`}
+            >
+              {isRecording ? <Square /> : <Mic />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleReset}
+              className="h-10 w-10 rounded-full bg-zinc-700/50 text-zinc-400 hover:text-zinc-300 hover:bg-zinc-700/50"
+            >
+              <RotateCcw />
+            </Button>
+          </div>
           <Button
             size="icon"
             onClick={handleSend}

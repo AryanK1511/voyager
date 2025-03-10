@@ -10,7 +10,7 @@ type NavbarProps = {
 
 export const Navbar: FC<NavbarProps> = ({ currentModel, setCurrentModel }) => {
   return (
-    <header className="flex h-12 w-full items-center justify-between px-16 pt-12 pb-4">
+    <header className="fixed top-0 left-0 right-0 z-50 flex h-24 w-full items-center justify-between px-16 bg-dark-background">
       <div className="flex items-center gap-2">
         <ModelSelector currentModel={currentModel} setCurrentModel={setCurrentModel} />
       </div>
