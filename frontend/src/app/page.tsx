@@ -21,7 +21,7 @@ const Home: FC = () => {
       >
         <Navbar currentModel={currentModel} setCurrentModel={setCurrentModel} />
         <div className="w-full">
-          <Hero />
+          <Hero currentModel={currentModel} />
         </div>
       </motion.div>
     </main>

@@ -5,10 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import Image from 'next/image';
 import { DefaultPromptsSection, SearchBar, AuroraText, ChatMessage } from '@/components';
-import { ApiHelper } from '@/lib';
+import { ApiHelper, AvailableModels } from '@/lib';
 import type { Message } from '@/lib';
 
-export const Hero: FC = () => {
+interface HeroProps {
+  currentModel: string;
+}
+
+export const Hero: FC<HeroProps> = ({ currentModel }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isChatMode, setIsChatMode] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
@@ -37,7 +41,7 @@ export const Hero: FC = () => {
     try {
       const response = await apiHelper.current.post('chat', {
         query: message,
-        model: 'gpt-4o-mini',
+        model: currentModel,
         history: messages.map((msg) => ({
           role: msg.role,
           content: msg.content,
@@ -91,6 +95,11 @@ export const Hero: FC = () => {
     } finally {
       setIsStreaming(false);
     }
+  };
+
+  const getModelDisplayName = () => {
+    const model = AvailableModels.find((m) => m.id === currentModel);
+    return model ? model.name : currentModel;
   };
 
   return (
@@ -208,6 +217,12 @@ export const Hero: FC = () => {
               className="fixed bottom-0 left-0 right-0 p-4 bg-dark-background flex justify-center"
             >
               <div className="w-full max-w-2xl">
+                <div className="flex items-center justify-center mb-2">
+                  <span className="text-xs text-zinc-400">
+                    Using model:{' '}
+                    <span className="text-purple-400 font-medium">{getModelDisplayName()}</span>
+                  </span>
+                </div>
                 <SearchBar onSend={handleSendMessage} disabled={isStreaming} />
                 <p className="mt-2 text-xs text-zinc-500 text-center">
                   Note: Voyager can make mistakes. Please verify important information and consider
