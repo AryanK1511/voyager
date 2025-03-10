@@ -132,12 +132,15 @@ export const SearchBar: FC<SearchBarProps> = ({ onSend }) => {
         <Textarea
           ref={textareaRef}
           value={value}
-          onChange={(e) => setValue(e.target.value)}
+          onChange={(e) => setValue(e.target.value.slice(0, 2000))}
           onKeyDown={handleKeyDown}
           placeholder="Ask Anything about Aryan"
           className="w-full resize-none border-none bg-transparent px-0 py-0 text-zinc-300 placeholder:text-zinc-500 focus:ring-0 focus-visible:ring-0 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-zinc-800/50 [&::-webkit-scrollbar-thumb]:bg-zinc-600 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-zinc-500"
           rows={1}
         />
+        <div className="flex justify-end mt-1">
+          <span className="text-xs text-zinc-500">{value.length}/2000</span>
+        </div>
         <div className="flex items-center justify-between mt-6">
           <div className="flex gap-2">
             <Button

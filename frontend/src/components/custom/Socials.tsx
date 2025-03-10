@@ -6,7 +6,7 @@ import { Linkedin, Github, Globe } from 'lucide-react';
 
 export const Socials: FC = () => {
   return (
-    <div className="flex flex-col items-center gap-4 p-6 bg-black">
+    <div className="flex flex-col items-center gap-4 p-6 bg-dark-background">
       <div className="flex flex-wrap justify-center gap-2">
         <Link
           href="https://www.linkedin.com/in/aryank1511/"

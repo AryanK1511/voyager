@@ -1,51 +1,49 @@
 // frontend/src/lib/constants.ts
 
 import type { Model, PromptCard } from '@/lib';
-import { FileText, Languages, Image } from 'lucide-react';
+import { Briefcase, Code2, FolderKanban } from 'lucide-react';
 
 export const AvailableModels: Model[] = [
   {
     id: 'GPT-4o mini',
     name: 'gpt-4o-mini',
-    description: 'Fast, affordable small model for focused tasks',
+    description: 'Uses OpenAI and gives quick responses for basic professional queries.',
     badge: {
-      text: 'recommended',
-      variant: 'secondary',
+      text: 'Most Popular',
+      variant: 'default',
     },
   },
   {
     id: 'GPT-4o',
     name: 'gpt-4o',
-    description: 'Fast, intelligent, flexible GPT model',
+    description: 'Uses OpenAI and gives better responses than GPT 4o mini but is slower.',
   },
   {
     id: 'Gemini 2.0 Flash',
     name: 'gemini-2.0-flash',
-    description:
-      'Next generation features, speed, and multimodal generation for a diverse variety of tasks',
+    description: 'Similar to GPT 4o Mini but uses Google.',
   },
   {
     id: 'Gemini 1.5 Pro',
     name: 'gemini-1.5-pro',
-    description: 'Complex reasoning tasks requiring more intelligence',
+    description: 'Similar to GPT 4o but uses Google.',
   },
 ];
 
 export const DefaultPrompts: PromptCard[] = [
   {
-    icon: FileText,
-    title: 'Resume-related Question',
-    description: "What's Aryan's work experience?",
-  },
-
-  {
-    icon: Languages,
-    title: 'Job-specific questions',
-    description: 'Is Aryan qualified for {job_description}?',
+    icon: Briefcase,
+    title: 'Professional Experience',
+    description: "What are Aryan's key achievements and roles in his career?",
   },
   {
-    icon: Image,
-    title: 'Generic Questions',
-    description: "What is Aryan's favorite food?",
+    icon: Code2,
+    title: 'Technical Skills',
+    description: 'What technologies and programming languages does Aryan specialize in?',
+  },
+  {
+    icon: FolderKanban,
+    title: 'Projects & Portfolio',
+    description: "Tell me about Aryan's notable projects and contributions",
   },
 ];

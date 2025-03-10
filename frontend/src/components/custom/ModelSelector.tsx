@@ -43,7 +43,7 @@ export const ModelSelector: FC<ModelSelectorProps> = ({ currentModel, setCurrent
               <div className="flex items-center gap-2">
                 <span className="font-medium">{model.name}</span>
                 {model.badge && (
-                  <span className="rounded bg-zinc-700 px-1 py-0.5 text-[10px] font-medium uppercase tracking-wider">
+                  <span className="rounded bg-gradient-to-r from-purple-600 to-pink-600 px-1 py-0.5 text-[10px] font-medium uppercase tracking-wider">
                     {model.badge.text}
                   </span>
                 )}

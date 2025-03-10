@@ -13,8 +13,8 @@ interface AuroraTextProps {
 export function AuroraText({
   children,
   className = '',
-  colors = ['#a855f7', '#ec4899', '#a855f7', '#ec4899', '#a855f7', '#ec4899'],
-  speed = 2,
+  colors = ['#7e22ce', '#a855f7', '#c084fc', '#d946ef', '#ec4899', '#f472b6'],
+  speed = 6,
 }: AuroraTextProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const textRef = useRef<SVGTextElement>(null);
