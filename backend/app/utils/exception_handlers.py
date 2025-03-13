@@ -1,3 +1,5 @@
+# backend/app/utils/exception_handlers.py
+
 import traceback
 
 from fastapi import Request
