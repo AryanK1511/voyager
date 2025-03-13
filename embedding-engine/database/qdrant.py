@@ -8,10 +8,16 @@ from utils.logging import console, err_console  # noqa
 
 class QdrantDatabase:
     def __init__(self):
-        console.print("🔹 [blue]Connecting to Qdrant Cloud...[/blue]")
-        self.client = QdrantClient(
-            url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY
-        )
+        if settings.PYTHON_ENV.lower() == "prod":
+            console.print("🔹 [blue]Connecting to Qdrant Cloud (PROD)...[/blue]")
+            self.client = QdrantClient(
+                url=settings.QDRANT_URL, api_key=settings.QDRANT_API_KEY
+            )
+        else:
+            console.print(
+                "🔹 [blue]Connecting to local Qdrant Docker container (DEV)...[/blue]"
+            )
+            self.client = QdrantClient(url="http://localhost:6333")
 
         console.print("🔹 [blue]Creating collection if it doesn't exist...[/blue]")
         try:
