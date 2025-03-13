@@ -8,7 +8,7 @@ import { Navbar, Hero } from '@/components';
 import { AvailableModels } from '@/lib';
 
 const Home: FC = () => {
-  const [currentModel, setCurrentModel] = useState(AvailableModels[0].id);
+  const [currentModel, setCurrentModel] = useState(AvailableModels[0]);
 
   return (
     <main className="min-h-screen flex flex-col text-white">

@@ -5,8 +5,8 @@ import { Briefcase, Code2, FolderKanban } from 'lucide-react';
 
 export const AvailableModels: Model[] = [
   {
-    id: 'GPT-4o mini',
-    name: 'gpt-4o-mini',
+    id: 'gpt-4o-mini',
+    name: 'GPT-4o mini',
     description: 'Uses OpenAI and gives quick responses for basic professional queries.',
     badge: {
       text: 'Most Popular',
@@ -14,18 +14,18 @@ export const AvailableModels: Model[] = [
     },
   },
   {
-    id: 'GPT-4o',
-    name: 'gpt-4o',
+    id: 'gpt-4o',
+    name: 'GPT-4o',
     description: 'Uses OpenAI and gives better responses than GPT 4o mini but is slower.',
   },
   {
-    id: 'Gemini 2.0 Flash',
-    name: 'gemini-2.0-flash',
+    id: 'gemini-2.0-flash',
+    name: 'Gemini 2.0 Flash',
     description: 'Similar to GPT 4o Mini but uses Google.',
   },
   {
-    id: 'Gemini 1.5 Pro',
-    name: 'gemini-1.5-pro',
+    id: 'gemini-1.5-pro',
+    name: 'Gemini 1.5 Pro',
     description: 'Similar to GPT 4o but uses Google.',
   },
 ];

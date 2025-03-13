@@ -14,6 +14,7 @@ export type {
   ModelSelectorProps,
   NavbarProps,
   SearchBarProps,
+  HeroProps,
 } from './types';
 export { AvailableModels, DefaultPrompts } from './constants';
 export { ApiHelper } from './utils/apiHelper';
