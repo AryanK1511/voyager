@@ -47,13 +47,3 @@ class QdrantDatabase:
 
     def add_documents(self, docs):
         self.vector_store.add_documents(docs)
-
-    def search(self, query, k=2):
-        results = self.vector_store.similarity_search_with_score(query, k=k)
-        processed_results = []
-
-        for doc, score in results:
-            doc.metadata["score"] = round(score, 4)
-            processed_results.append(doc)
-
-        return processed_results

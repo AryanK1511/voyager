@@ -14,6 +14,10 @@ class Settings(BaseSettings):
     QDRANT_API_KEY: str = ""
     QDRANT_COLLECTION_NAME: str = ""
     QDRANT_URL: str = ""
+    LANGSMITH_TRACING: bool = False
+    LANGSMITH_ENDPOINT: str = ""
+    LANGSMITH_API_KEY: str = ""
+    LANGSMITH_PROJECT: str = ""
 
     class Config:
         env_file = ".env"
