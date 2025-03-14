@@ -1,3 +1,6 @@
+# backend/app/main.py
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -28,6 +31,8 @@ def create_app() -> FastAPI:
 
 # ========== FAST API APPLICATION ==========
 app: FastAPI = create_app()
+
+load_dotenv()
 
 
 # ========== HEALTH CHECK ROUTE ==========

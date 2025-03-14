@@ -5,17 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import Image from 'next/image';
 import { DefaultPromptsSection, SearchBar, AuroraText, ChatMessage } from '@/components';
-import { ApiHelper, AvailableModels } from '@/lib';
-import type { Message } from '@/lib';
-
-interface HeroProps {
-  currentModel: string;
-}
+import { ApiHelper } from '@/lib';
+import type { HeroProps, Message } from '@/lib';
 
 export const Hero: FC<HeroProps> = ({ currentModel }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isChatMode, setIsChatMode] = useState(false);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isWaitingForStream, setIsWaitingForStream] = useState(false);
   const [streamedContent, setStreamedContent] = useState('');
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -35,13 +32,14 @@ export const Hero: FC<HeroProps> = ({ currentModel }) => {
     const userMessage: Message = { role: 'user', content: message };
     setMessages((prev) => [...prev, userMessage]);
     setIsChatMode(true);
-    setIsStreaming(true);
+    setIsWaitingForStream(true);
+    setIsStreaming(false);
     setStreamedContent('');
 
     try {
       const response = await apiHelper.current.post('chat', {
         query: message,
-        model: currentModel,
+        model: currentModel.id,
         history: messages.map((msg) => ({
           role: msg.role,
           content: msg.content,
@@ -61,6 +59,9 @@ export const Hero: FC<HeroProps> = ({ currentModel }) => {
       if (!reader) {
         throw new Error('No reader available');
       }
+
+      setIsWaitingForStream(false);
+      setIsStreaming(true);
 
       const decoder = new TextDecoder();
       let accumulatedContent = '';
@@ -93,13 +94,9 @@ export const Hero: FC<HeroProps> = ({ currentModel }) => {
         },
       ]);
     } finally {
+      setIsWaitingForStream(false);
       setIsStreaming(false);
     }
-  };
-
-  const getModelDisplayName = () => {
-    const model = AvailableModels.find((m) => m.id === currentModel);
-    return model ? model.name : currentModel;
   };
 
   return (
@@ -178,7 +175,7 @@ export const Hero: FC<HeroProps> = ({ currentModel }) => {
                       <ChatMessage role={message.role} content={message.content} />
                     </motion.div>
                   ))}
-                  {isStreaming && streamedContent && (
+                  {(isWaitingForStream || (isStreaming && streamedContent)) && (
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -200,7 +197,18 @@ export const Hero: FC<HeroProps> = ({ currentModel }) => {
                         <div className="flex-1 w-full">
                           <div className="font-medium text-zinc-300 mb-1">Voyager</div>
                           <div className="prose prose-invert max-w-none w-full">
-                            <ReactMarkdown>{streamedContent}</ReactMarkdown>
+                            {isWaitingForStream ? (
+                              <div className="flex items-center">
+                                <span className="text-zinc-400">Thinking</span>
+                                <span className="ml-2 inline-flex">
+                                  <span className="animate-pulse text-purple-400 delay-0">.</span>
+                                  <span className="animate-pulse text-purple-400 delay-300">.</span>
+                                  <span className="animate-pulse text-purple-400 delay-600">.</span>
+                                </span>
+                              </div>
+                            ) : (
+                              <ReactMarkdown>{streamedContent}</ReactMarkdown>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -220,7 +228,7 @@ export const Hero: FC<HeroProps> = ({ currentModel }) => {
                 <div className="flex items-center justify-center mb-2">
                   <span className="text-xs text-zinc-400">
                     Using model:{' '}
-                    <span className="text-purple-400 font-medium">{getModelDisplayName()}</span>
+                    <span className="text-purple-400 font-medium">{currentModel.name}</span>
                   </span>
                 </div>
                 <SearchBar onSend={handleSendMessage} disabled={isStreaming} />

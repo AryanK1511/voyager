@@ -1,12 +1,10 @@
-from dotenv import load_dotenv
+# backend/app/api/v1/endpoints/chat.py
+
 from fastapi import APIRouter, Response
 from fastapi import Request as ServerRequest
 from fastapi.responses import StreamingResponse
-from langchain.schema import AIMessage, HumanMessage
-from langchain_google_genai import ChatGoogleGenerativeAI
 
-load_dotenv()
-
+from app.services.AIService import AIService
 from app.utils.logger import CustomLogger
 from app.utils.response import error_response
 
@@ -19,33 +17,25 @@ async def get_response(req: ServerRequest, res: Response):
         data = await req.json()
         query = data.get("query")
         history = data.get("history", [])
+        model = data.get("model", "gpt-4o-mini")
 
         if not query:
             return error_response("Query is required", 400, res)
 
-        CustomLogger.create_log("info", "Running chat endpoint")
+        CustomLogger.create_log("info", f"Running chat endpoint with model: {model}")
 
-        messages = []
-        for msg in history:
-            if msg["role"] == "user":
-                messages.append(HumanMessage(content=msg["content"]))
-            elif msg["role"] == "bot":
-                messages.append(AIMessage(content=msg["content"]))
-
-        # Add the current query to the messages
-        messages.append(HumanMessage(content=query))
-
-        llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", streaming=True)
+        ai_service = AIService(model=model)
 
         async def stream_response():
-            async for chunk in llm.astream(messages):
-                yield f"data: {chunk.content}\n\n"
+            response_generator = await ai_service.get_response(model, query, history)
+            async for chunk in response_generator:
+                yield f"data: {chunk}\n\n"
 
         return StreamingResponse(stream_response(), media_type="text/event-stream")
 
     except ValueError as e:
-        CustomLogger.create_log("error", f"Error generating commands: {str(e)}")
+        CustomLogger.create_log("error", f"Error generating response: {str(e)}")
         return error_response(str(e), 400, res)
     except Exception as e:
-        CustomLogger.create_log("error", f"Error creating user: {str(e)}")
+        CustomLogger.create_log("error", f"Unexpected error: {str(e)}")
         raise e

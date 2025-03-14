@@ -59,16 +59,20 @@ export type Message = {
 };
 
 export type ModelSelectorProps = {
-  currentModel: string;
-  setCurrentModel: (model: string) => void;
+  currentModel: Model;
+  setCurrentModel: (model: Model) => void;
 };
 
 export type NavbarProps = {
-  currentModel: string;
-  setCurrentModel: (model: string) => void;
+  currentModel: Model;
+  setCurrentModel: (model: Model) => void;
 };
 
 export type SearchBarProps = {
   onSend: (message: string) => void;
   disabled?: boolean;
+};
+
+export type HeroProps = {
+  currentModel: Model;
 };
